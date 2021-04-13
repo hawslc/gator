@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Copter</title>
+    <link rel="stylesheet" href="/style.css">
+  </head>
+  <body>
+    <div class="top-bar">
+      <div class="top-bar-background"></div>
+      <img class="top-bar-gator" src="/images/gator-white.png" alt="Gator">
+      <h1 class="top-bar-title">New Image.png</h1>
+      <img class="top-bar-profile" src="/images/blueMeshCircle2.png" alt="Profile">
+      <img class="top-bar-home" src="/images/home2-white.png" alt="Home">
+    </div>
+
+    <div class="main-area">
+      <div class="side-bar">
+        <div class="side-bar-background"></div>
+
+        <div class="tools-area">
+          <h2 class="tools-title">Tools:</h2>
+          <div class="tool-item" id="tool-0">
+            <img class="tool-image" src="/images/paintbrush_white.png" alt="Home">
+          </div>
+          <div class="tool-item" id="tool-1">
+            <img class="tool-image-s" src="/images/square.png" alt="Home">
+          </div>
+          <div class="tool-item" id="tool-2">
+            <img class="tool-image-s" src="/images/circle.png" alt="Home">
+          </div>
+          <div class="tool-item" id="tool-3">
+            <img class="tool-image" src="/images/line.png" alt="Home">
+          </div>
+          <div class="tool-item" id="tool-4">
+            <img class="tool-image" src="/images/text.png" alt="">
+          </div>
+          <div class="tool-item" id="tool-5">
+            <img class="tool-image-h" src="/images/white-bucket.png" alt="">
+          </div>
+          <div class="tool-item" id="tool-6">
+            <img class="tool-image" src="/images/pencil.png" alt="">
+          </div>
+          <div class="tool-item" id="tool-7">
+            <img class="tool-image" src="/images/copter-white.png" alt="">
+          </div>
+        </div>
+
+        <hr class="side-bar-break">
+
+        <div class="properties-area">
+          <div class="properties-left-area">
+            <h2 class="properties-color-text">Color:</h2>
+            <h2 class="properties-hue-text">Hue:</h2>
+            <h2 class="properties-saturation-text">Saturation</h2>
+            <h2 class="properties-value-text">Value</h2>
+          </div>
+          <div class="properties-right-area">
+            <input type="text" name="" value="#536f23" class="color-input">
+            <div class="hue-slider"></div>
+            <div class="saturation-slider"></div>
+            <div class="value-slider"></div>
+          </div>
+          <div class="properties-bottom-area">
+            <div class="properties-buttons">
+              <div class="filled-button">
+                <p class="filled-text">Filled</p>
+                <img class="filled-image" src="/images/home2-white.png" alt="Home">
+              </div>
+              <div class="outlined-button">
+                <p class="outlined-text">Outlined</p>
+                <img class="outlined-image" src="/images/home2-white.png" alt="Home">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <hr class="side-bar-break">
+
+        <div class="more-area">
+          <h2 class="width-text">Width:</h2>
+          <input type="text" name="" value="20px" class="width-input">
+          <div class="import-button">
+            <p class="import-text">Import</p>
+          </div>
+          <div class="export-button">
+            <p class="export-text">Export</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="image-area">
+        <canvas id="canvas" class="main-canvas"></canvas>
+      </div>
+      <div class="right-bar">
+
+      </div>
+    </div>
+  </body>
+
+  <script src="functions.js"></script>
+  <script src="main.js"></script>
+</html>
