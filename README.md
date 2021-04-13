@@ -1,4 +1,4 @@
 # gator
 an online SVG editor
 made by me
-link
+link: https://hawslc.github.io/gator/
