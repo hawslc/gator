@@ -2,14 +2,14 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
-    <title>Copter</title>
-    <link rel="stylesheet" href="https://hawslc.github.io/gator/style.css">
+    <title>Gator</title>
+    <link rel="stylesheet" href="./style.css">
   </head>
   <body>
     <div class="top-bar">
-      <div class="top-bar-background"></div>
-      <img class="top-bar-gator" src="https://hawslc.github.io/gator/images/gator-white.png" alt="Gator">
-      <h1 class="top-bar-title">New Image.png</h1>
+      <div class="top-bar-background" id="top-bar-background"></div>
+      <img class="top-bar-gator" src="./images/gator-white.png" alt="Gator">
+      <h1 class="top-bar-title"></h1>
       <img class="top-bar-profile" src="./images/blueMeshCircle2.png" alt="Profile">
       <img class="top-bar-home" src="./images/home2-white.png" alt="Home">
     </div>
@@ -19,9 +19,8 @@
         <div class="side-bar-background"></div>
 
         <div class="tools-area">
-          <h2 class="tools-title">Tools:</h2>
           <div class="tool-item" id="tool-0">
-            <img class="tool-image" src="./images/paintbrush_white.png" alt="Home">
+            <img class="tool-image" src="./images/pencil.png" alt="Home">
           </div>
           <div class="tool-item" id="tool-1">
             <img class="tool-image-s" src="./images/square.png" alt="Home">
@@ -33,71 +32,159 @@
             <img class="tool-image" src="./images/line.png" alt="Home">
           </div>
           <div class="tool-item" id="tool-4">
-            <img class="tool-image" src="./images/text.png" alt="">
+            <img class="tool-image-s" src="./images/text.png" alt="">
           </div>
           <div class="tool-item" id="tool-5">
-            <img class="tool-image-h" src="./images/white-bucket.png" alt="">
+            <img class="tool-image" src="./images/eraser.png" alt="">
           </div>
           <div class="tool-item" id="tool-6">
-            <img class="tool-image" src="./images/pencil.png" alt="">
+            <img class="tool-image-h" src="./images/white-bucket.png" alt="">
           </div>
           <div class="tool-item" id="tool-7">
-            <img class="tool-image" src="./images/copter-white.png" alt="">
+            <img class="tool-image-h" src="./images/cursor.png" alt="">
           </div>
         </div>
 
-        <hr class="side-bar-break">
-
         <div class="properties-area">
+          <hr class="side-bar-break">
           <div class="properties-left-area">
-            <h2 class="properties-color-text">Color:</h2>
-            <h2 class="properties-hue-text">Hue:</h2>
-            <h2 class="properties-saturation-text">Saturation</h2>
-            <h2 class="properties-value-text">Value</h2>
+            <div class="properties-left-spacer"></div>
+            <h2 class="properties-text">H</h2>
+            <h2 class="properties-text">S</h2>
+            <h2 class="properties-text">V</h2>
+            <h2 class="properties-text">A</h2>
           </div>
           <div class="properties-right-area">
-            <input type="text" name="" value="#536f23" class="color-input">
-            <div class="hue-slider"></div>
-            <div class="saturation-slider"></div>
-            <div class="value-slider"></div>
+            <div class="color-preview" id="color-preview"></div>
+            <input type="text" name="" value="#A36F23" class="color-input" id="color-input">
+            <div class="color-slider-background-h" id="h-slider-background">
+              <div class="color-slider-h" id="h-slider"></div>
+            </div>
+            <div class="color-slider-background" id="s-slider-background">
+              <div class="color-slider-s" id="s-slider"></div>
+            </div>
+            <div class="color-slider-background" id="v-slider-background">
+              <div class="color-slider-v" id="v-slider"></div>
+            </div>
+            <div class="color-slider-background" id="a-slider-background">
+              <div class="color-slider-background-a"></div>
+              <div class="color-slider-a" id="a-slider"></div>
+            </div>
           </div>
           <div class="properties-bottom-area">
             <div class="properties-buttons">
-              <div class="filled-button">
+              <div class="filled-button" id="filled-button">
                 <p class="filled-text">Filled</p>
-                <img class="filled-image" src="/images/home2-white.png" alt="Home">
+                <img class="filled-image" src="/images/square.png" alt="Home">
               </div>
-              <div class="outlined-button">
+              <div class="outlined-button" id="outlined-button">
                 <p class="outlined-text">Outlined</p>
-                <img class="outlined-image" src="/images/home2-white.png" alt="Home">
+                <img class="outlined-image" src="/images/selection.png" alt="Home">
               </div>
             </div>
           </div>
         </div>
 
-        <hr class="side-bar-break">
-
         <div class="more-area">
-          <h2 class="width-text">Width:</h2>
-          <input type="text" name="" value="20px" class="width-input">
-          <div class="import-button">
-            <p class="import-text">Import</p>
+          <hr class="side-bar-break">
+          
+          <div class="width-area" id="width-area">
+            <h2 class="width-text" id="width-text">Width:</h2>
+            <input type="text" name="" value="5" class="width-input" id="width-input">
+            <div class="property-spacer"></div>
           </div>
-          <div class="export-button">
-            <p class="export-text">Export</p>
+          <div class="width-area" id="border-radius-area">
+            <h2 class="border-radius-text" id="border-radius-text">Border radius:</h2>
+            <input type="text" name="" value="5" class="width-input" id="border-radius-input">
+            <div class="property-spacer"></div>
           </div>
+          
+          <div class="share-area">
+            <input id="import-upload" type="file"/>
+            <label for="import-upload" class="import-button">
+              <p class="import-export-text">Import</p>
+              <img class="import-export-image" src="/images/upload.png" alt="Home">
+            </label>
+            
+            
+            <a class="export-button" id="export-button">
+              <p class="import-export-text">Export</p>
+              <img class="import-export-image" src="/images/download.png" alt="Home">
+            </a>
+            
+          </div>
+          
         </div>
+
+        <div class="vertical-spacer"></div>
+        <div class="vertical-spacer"></div>
+        <div class="vertical-spacer"></div>
       </div>
 
       <div class="image-area">
         <canvas id="canvas" class="main-canvas"></canvas>
       </div>
       <div class="right-bar">
+        <div class="right-bar-background"></div>
+        <div class="action-area">
+          <div class="action-item" id="action-0">
+            <img class="action-image" src="./images/undo-white.png" alt="">
+          </div>
+          <div class="action-item" id="action-1">
+            <img class="action-image" src="./images/redo-white.png" alt="">
+          </div>
+          <div class="action-item" id="action-2">
+            <img class="action-image" src="./images/layer-front.png" alt="">
+          </div>
+          <div class="action-item" id="action-3">
+            <img class="action-image" src="./images/layer-back.png" alt="">
+          </div>
+          <div class="action-item" id="action-4">
+            <img class="action-image" src="./images/layer-top.png" alt="">
+          </div>
+          <div class="action-item" id="action-5">
+            <img class="action-image" src="./images/layer-bottom.png" alt="">
+          </div>
+          <div class="action-item" id="action-6">
+            <img class="action-image" src="./images/duplicate.png" alt="">
+          </div>
+          <div class="action-item" id="action-7">
+            <img class="action-image-h" src="./images/trash.png" alt="">
+          </div>
 
+          <!--
+          <div class="action-item" id="action-8">
+            <img class="action-image" src="./images/rotate-right.png" alt="">
+          </div>
+          <div class="action-item" id="action-9">
+            <img class="action-image" src="./images/rotate-left.png" alt="">
+          </div>
+          <div class="action-item" id="action-10">
+            <img class="action-image" src="./images/flip-horizontal.png" alt="">
+          </div>
+          <div class="action-item" id="action-11">
+            <img class="action-image" src="./images/flip-vertical.png" alt="">
+          </div>
+          <div class="action-item" id="action-12">
+            <img class="action-image" src="./images/group.png" alt="">
+          </div>
+          <div class="action-item" id="action-13">
+            <img class="action-image" src="./images/ungroup.png" alt="">
+          </div>
+          -->
+          
+          <div class="vertical-spacer"></div>
+        </div>
       </div>
     </div>
   </body>
 
   <script src="functions.js"></script>
+  <script src="init.js"></script>
+  <script src="color.js"></script>
+  <script src="item.js"></script>
+  <script src="text.js"></script>
+  <script src="select.js"></script>
+  <script src="actions.js"></script>
   <script src="main.js"></script>
 </html>

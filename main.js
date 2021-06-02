@@ -1,43 +1,15 @@
-//main.js  
-
+//main.js
+//handles main stuff and most of the drawing
 
 //variables
-var canvas = find('canvas');
-var pos = {x:undefined, y:undefined};
-var offset = {x:-320, y:-70};
-var ctx = canvas.getContext('2d');
-var buffer = undefined;
-var writing = false; //if the user is typing text
-var tool = 3;
-var tools = 8; //total number of tools
-
 init();
 
 //events
 document.addEventListener('mousedown', mouseDown);
-document.addEventListener('mousemove', draw);
-
-//initialize
-function init() {
-  canvas.width = window.innerWidth + offset.x;
-  canvas.height = window.innerHeight + offset.y;
-
-  //abstraction making my life easier :)
-  for (var i = 0; i < tools; i++) {
-    setupEventListener(i);
-  }
-}
-
-//makes the buttons switch between tools
-function setupEventListener(i) {
-  find("tool-" + i).addEventListener('click',() => {
-    changeTool(i);
-  });
-}
-
-function changeTool(i) {
-  tool = i;
-}
+document.addEventListener('mousemove', mouseMoved);
+document.addEventListener('mouseup', mouseUp); 
+document.addEventListener('keydown', keyDown);
+document.addEventListener('keyup', keyUp); 
 
 //set the position on a mouse event
 function updatePosition(e) {
@@ -45,21 +17,101 @@ function updatePosition(e) {
   pos.y = e.clientY;
 }
 
+find("canvas").onmouseleave = function mouseLeaveCanvas() {
+  //when the mouse leaves the canvas, deselect under certain conditions
+  if (tool != 4 && tool != 7) { 
+    currentItem = undefined;
+    if (isMouseDown) imageChanged();
+  }
+}
+
+function isOffCanvas(e) {
+  //returns true if the mouse is not over the canvas
+  return e.clientX < offset.x * -1 || e.clientY < offset.y * -1 || e.clientX > window.innerWidth - 50;
+}
+
 function mouseDown(e) {
   //do stuff when the mouse is down
-  updatePosition(e);
+  isMouseDown = true;
+  //first make sure we are on the canvas
+  if (isOffCanvas(e)) return;
 
-  if (tool == 1 || tool == 2 || tool == 3) {
-    buffer = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  //now do things
+  updatePosition(e);
+  buffer = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  //non-drawing tools
+  if (tool == 7) {
+    selectTool(e);
+    return;
   }
   if (tool == 4) {
-    //writing text
+    if (textClickMovingCursor(e)) {
+      //just moving the cursor, dont create new item
+      redraw(); 
+      return;
+    }
+  }
+
+  currentItem = new Item(tool);
+
+  currentItem.color = {h: currentColor.h, s: currentColor.s, v: currentColor.v, a: currentColor.a};
+
+  currentItem.filled = isFilled;
+  currentItem.width = currentWidth;
+
+  items.push(currentItem);
+  currentItem.pos = {x: e.clientX + offset.x, y: e.clientY + offset.y};
+
+  if (tool == 0 || (tool == 5 && !eraseByObject)) {
+		currentItem.addPath(e.clientX + offset.x, e.clientY + offset.y);
+    currentItem.renderLastStroke(ctx);
+  } 
+  if (tool == 1) {
+    currentItem.roundness = currentBorderRadius;
+  }
+  if (tool == 4) {
+    currentItem.font = '12px Helvetica';
+    setupTextInput(e);
+  }
+  if ((tool == 5 && !eraseByObject)) {
+    //currentItem.color = "#000000";
+  }
+  if (tool == 6) {
+    fillBucket(e); //fill bucket done on start
+  }
+}
+
+function mouseMoved(e) {
+  updateSliders(e);
+
+  if (isOffCanvas(e)) return;
+  draw(e);
+  mousePos.x = e.clientX;
+  mousePos.y = e.clientY;
+  //mousepos updating is after so it allows for offsets
+}
+
+function mouseUp(e) {
+  //when they finish drawing an object, make that object calculate
+  //its height and width
+  isMouseDown = false;
+  if (currentItem) {
+    currentItem.calculateDimensions();
+  }
+
+  if (!isOffCanvas(e)) imageChanged(0);//update version history
+
+  if (tool == 7 && !isOffCanvas(e)) {
+    selectMouseUp();
   }
 }
 
 function draw(e) {
   //first, return if left mouse button is not pressed
   if (e.buttons !== 1) return;
+  //also return if outside canvas or the current item is null
+  if (isOffCanvas(e)) return;
+  if (!currentItem) return;
 
   //decides what to draw
   switch (tool) {
@@ -79,13 +131,18 @@ function draw(e) {
       //text, do nothing
       break;
     case 5:
-      drawPen(e);
+      //account for object eraser
+      if (eraseByObject) { 
+        drawObjectEraser(e);
+      } else { 
+        drawPen(e); //eraser is implimented within the object class
+      }
       break;
     case 6:
-      drawPen(e);
+      fillBucket(e);
       break;
     case 7:
-      drawPen(e);
+      moveSelectedItem(e);
       break;
     default:
       drawPen(e);
@@ -95,60 +152,251 @@ function draw(e) {
 
 //draw with pen
 function drawPen(e) {
-  //first make sure we have a valid previous point to draw from
-  if (!pos.x || !pos.y) {
-    updatePosition(e);
-    return;
-  }
-  //draw from previous position
-  ctx.beginPath();
+  ctx.putImageData(buffer, 0, 0);
 
-  //properties
-  ctx.lineWidth = 5;
-  ctx.lineCap = 'round';
-  ctx.strokeStyle = '#020304';
-
-  //draw it
-  ctx.moveTo(pos.x + offset.x, pos.y + offset.y); //from this spot
-  updatePosition(e);
-  ctx.lineTo(pos.x + offset.x, pos.y + offset.y); //to this spot
-
-  //draw
-  ctx.stroke();
+  currentItem.addPath(e.clientX + offset.x, e.clientY + offset.y);
+  currentItem.render();
 }
 
 function drawPolygon(e) {
   //draws a polygon, right now its only a square
-  ctx.putImageData(buffer, 0, 0);
-  ctx.fillStyle = '#020304';
-  ctx.fillRect(pos.x + offset.x, pos.y + offset.y, e.clientX - pos.x, e.clientY - pos.y);
+  ctx.putImageData(buffer, 0, 0); 
+
+  var size = {x: e.clientX + offset.x - currentItem.pos.x, y: e.clientY + offset.y - currentItem.pos.y};
+
+  //account for squares
+  if (isShiftKeyDown) {
+    var larger = Math.max(Math.abs(size.x), Math.abs(size.y));
+    var neg = {x: size.x < 0, y: size.y < 0};
+    size.x = larger * (neg.x ? -1 : 1);
+    size.y = larger * (neg.y ? -1 : 1);
+  }
+
+	currentItem.size = size;
+
+  //before we render the current item, account for rounded rectangles
+  if (isFilled) {
+    if (currentBorderRadius > 0) {
+      currentItem.type = 8;
+      currentItem.roundness = currentBorderRadius;
+    } else {
+      currentItem.type = 1;
+    }
+  }
+	//render the current item
+	currentItem.render();
 }
 
 function drawEllipse(e) {
   //draws a polygon, right now its only a square
   ctx.putImageData(buffer, 0, 0);
-  ctx.fillStyle = '#020304';
-  ctx.beginPath();
-  var distance = Math.sqrt((e.clientX - pos.x) * (e.clientX - pos.x) + (e.clientY - pos.y) * (e.clientY - pos.y));
-  ctx.arc(pos.x + offset.x, pos.y + offset.y, distance, 0, 2 * Math.PI);
-  ctx.fill();
+  var size = {x:e.clientX + offset.x - currentItem.pos.x, y:e.clientY + offset.y - currentItem.pos.y};
+
+  //if shiftKey then only draw circles
+  if (isShiftKeyDown) {
+    var larger = Math.max(Math.abs(size.x), Math.abs(size.y));
+    var neg = {x: size.x < 0, y: size.y < 0};
+    size.x = larger * (neg.x ? -1 : 1);
+    size.y = larger * (neg.y ? -1 : 1);
+  }
+
+  currentItem.size.x = size.x;
+  currentItem.size.y = size.y;
+	//render the current item
+	currentItem.render();
 }
 
 function drawLine(e) {
   //draws a line
   ctx.putImageData(buffer, 0, 0);
+  var size = {x: e.clientX + offset.x - currentItem.pos.x, y: e.clientY + offset.y - currentItem.pos.y};
 
-  ctx.beginPath();
+  //account for squares
+  if (isShiftKeyDown) {
+    //basically, math
+    var theta = Math.atan2(size.y, size.x);
+    theta *= 180 / Math.PI; //still -180 to 180 range
+    if (theta < 0) theta += 360; //handle correct range
+    var octalet = Math.round((theta + 22.5) / 45 - ((theta + 22.5) % 45) / 45) % 8;
+    //the octalect is 0 for 0 degrees (right)
+    //and it increases by 1 every time you go up 45 degrees clockwise
+    //represents the nearest straight or 45 deg line to snap to
 
-  //properties
-  ctx.lineWidth = 5;
-  ctx.lineCap = 'round';
-  ctx.strokeStyle = '#020304';
+    switch (octalet) {
+      case 0:
+        //drawing to the right
+        size.y = 0;
+        break;
+      case 1:
+        //drawing to the right bottom
+        var n = Math.sqrt(size.x * size.x + size.y * size.y);
+        n /= Math.sqrt(2);
+        size.x = n;
+        size.y = n;
+        break;
+      case 2:
+        //drawing to the bottom
+        size.x = 0;
+        break;
+      case 3:
+        //drawing to the left bottom
+        var n = Math.sqrt(size.x * size.x + size.y * size.y);
+        n /= Math.sqrt(2);
+        size.x = n * -1;
+        size.y = n;
+        break;
+      case 4:
+        //drawing to the left
+        size.y = 0;
+        break;
+      case 5:
+        //drawing to the top left
+        var n = Math.sqrt(size.x * size.x + size.y * size.y);
+        n /= Math.sqrt(2);
+        size.x = n * -1;
+        size.y = n * -1;
+        break;
+      case 6:
+        //drawing to the top
+        size.x = 0;
+        break;
+      case 7:
+        //drawing to the top right 
+        var n = Math.sqrt(size.x * size.x + size.y * size.y);
+        n /= Math.sqrt(2);
+        size.x = n;
+        size.y = n * -1;
+        break;
+      default:
+        break;
+    }
+  }
 
-  //draw it
-  ctx.moveTo(pos.x + offset.x, pos.y + offset.y); //from this spot
-  ctx.lineTo(e.clientX + offset.x, e.clientY + offset.y); //to this spot
-
-  //draw
-  ctx.stroke();
+	currentItem.size = size;
+	//render the current item
+	currentItem.render();
 }
+
+function drawObjectEraser(e) {
+  currentItem.addPath(e.clientX + offset.x, e.clientY + offset.y);
+  currentItem.render();
+}
+
+function fillBucket(e) {
+  currentItem.render();
+}
+
+find("width-input").oninput = function() {
+  //currentWidth = find("width-input").value;
+  var s = parseInt(find("width-input").value);
+  if (isNaN(s)) {
+    s = parseInt(find("width-input").value.substring(2));
+  }
+
+  if(!isNaN(s)) {
+    if (find("width-text").innerHTML == "Width:") {
+      currentWidth = s;
+      if (currentItem) {
+        currentItem.width = currentWidth;
+        updateSelectedItem();
+      }
+    } else {
+      currentBorderRadius = s;
+      if (currentItem) {
+        if (currentItem.hasOwnProperty('roundness')) currentItem.roundness = currentBorderRadius;
+        updateSelectedItem();
+      }
+    }
+  }
+}
+
+//now, related to colors, the fill styles
+find("filled-button").onclick = function() {
+  isFilled = true;
+  updateFillType();
+  if(currentItem) updateSelectedItem();
+}
+
+find("outlined-button").onclick = function() {
+  isFilled = false;
+  updateFillType();
+  if(currentItem) updateSelectedItem();
+}
+
+function updateFillType() {
+  //updated the filled / outlined buttons and properties according to isFilled
+  if (isFilled) {
+    find("outlined-button").style.border = "solid #535359";
+    find("filled-button").style.border = "solid #E0E2E5";
+  } else {
+    find("outlined-button").style.border = "solid #E0E2E5";
+    find("filled-button").style.border = "solid #535359";
+  }
+  
+  if (currentItem) currentItem.filled = isFilled;
+}
+
+//keydowns and ups 
+function keyDown(e) {
+  isShiftKeyDown = e.shiftKey;
+} 
+
+function keyUp(e) {
+  isShiftKeyDown = e.shiftKey;
+}
+
+//uploading an image 
+find("import-upload").addEventListener('change', (e) => {
+  if (e.target.files) {
+    var file = e.target.files[e.target.files.length - 1];
+    var fileReader = new FileReader();
+    fileReader.readAsDataURL(file);
+    fileReader.onloadend = (e) => {
+      var image = new Image();
+      image.src = e.target.result;
+      image.onload = () => {
+        //create new item with the image 
+        currentItem = new Item(7);
+        items.push(currentItem);
+        currentItem.size.x = image.width;
+        currentItem.size.y = image.height;
+        currentItem.image = image;
+        fitImageToScreen(currentItem)
+        currentItem.render();
+      }
+    }
+  } 
+});
+
+function fitImageToScreen(item) {
+  //given an item of type image, it modifies the scale
+  //to fit inside the canvas area
+  if (item.size.x > canvas.width || item.size.y > canvas.height) {
+    //the image is too big: scale it down
+
+    //first calculate the ratio of the image to the canvas 
+    var aspect = {
+      x: item.size.x / canvas.width,
+      y: item.size.y / canvas.height
+    }
+    //then make it fit the screen
+    var max = Math.max(aspect.x, aspect.y);
+    item.scale.x = 1 / max;
+    item.scale.y = 1 / max;
+
+    //center it
+    if (aspect.x > aspect.y) {
+      //white space on vertical margins
+      item.pos.y += (canvas.height - item.size.y) / 2;
+    } else {
+      item.pos.x += (canvas.width - item.size.x) / 2;
+    }
+  }
+}
+
+//downloading an image 
+//4 lines of code from 2 hours of research
+find("export-button").addEventListener('click', () => { 
+  find("export-button").href = canvas.toDataURL("image/png").replace(/^data:image\/[^;]/, 'data:application/octet-stream');
+  find("export-button").click();
+}, false);

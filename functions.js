@@ -10,6 +10,14 @@ function setClass(element, className){
   element.className = className;
 }
 
+function show(s){
+  document.getElementById(s).style.display = 'block';
+}
+
+function hide(s){
+  document.getElementById(s).style.display = 'none';
+}
+
 function feedback(s){
   var fb = make("p");
   document.body.appendChild(fb);

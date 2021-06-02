@@ -1,0 +1,10 @@
+think
+
+x and y are any corner of the object
+there is no set corner that it has to be
+size is the width and height
+size does not include the scaling
+scale is the vertical and horizontal scaling of the item
+it can be negative
+
+the middle of an object (unscaled) should always be (size / 2 + pos)
