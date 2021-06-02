@@ -1,4 +1,5 @@
-//main.js
+//main.js  
+
 
 //variables
 var canvas = find('canvas');
