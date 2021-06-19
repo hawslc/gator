@@ -26,5 +26,7 @@ Some features I wanted to add include: rotation, grouping, horizontal and vertic
 So what have I learned?
 
 There's a reason Photoshop has no major competitors (except for GIMP, maybe). Desgining an image editor is not an easy process.
+
+I am glad I made gator, though. It taught me a lot about the design process for coding projects.
 <br>
 link: https://hawslc.github.io/gator/
