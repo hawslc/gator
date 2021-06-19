@@ -25,6 +25,6 @@ Some features I wanted to add include: rotation, grouping, horizontal and vertic
 
 So what have I learned?
 
-There's a reason Photoshop has no major competitors (GIMP maybe). That reason is that desgining an image editor is not an easy process.
+There's a reason Photoshop has no major competitors (except for GIMP, maybe). Desgining an image editor is not an easy process.
 <br>
 link: https://hawslc.github.io/gator/
