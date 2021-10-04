@@ -2,15 +2,19 @@
 
 //first group: canvas data
 var canvas = find('canvas');
-var offset = {x: -200, y: -70}; //canvas position
+var offset = {x: -200, y: -70}; //canvas position relative to top left
 var ctx = canvas.getContext('2d');
-var buffer = undefined; 
+var buffer = undefined;  
+var canvasSize = {x: 320, y: 320}; // the real size of the canvas, not the size displayed on the screen. for canvas scaling.
+var canvasPos = {x: 0, y: 0}; //the pos of the canvas, measured the same way any other item would be measured
 
 //second group: core data
 var items = []; //stores a list of all the items
 var currentItem = undefined;
 var mousePos = {x: 0, y: 0};
 var isMouseDown = false;
+var currentProject = -1;
+var canDraw = true; //used for save and loading menus and other GUI
 
 //third group: drawing data
 var tool = 0;
@@ -36,30 +40,37 @@ var selectStartOrientation = 0; //does something lol
 //fifth group: actions data
 var versionHistory = []; //like a .git file but less efficient
 var redoBuffer = [];//stores the undone actions in the case of a redo
-var actions = 8; //number of actions in total
+var actions = 10; //number of actions in total
 var actionNames = ["Undo", "Redo", "Move to front", "Move to back", "Move forward", "Move backward", "Duplicate", "Delete",
-"Rotate right", "Rotate left", "Flip horizontally", "Flip vertically", "Group items", "Ungroup items"];
+"Toggle Snapping", "Generators"];
 var currentTooltip; //keeps track of the current tooltip
+var snapping = true; //true or false, whether snapping is on or not
+var snapColor = "#8125c5";
 
 
 //initialize
 function init() {
-  canvas.width = window.innerWidth + offset.x - 50; //50 is for the right side bar
-  canvas.height = window.innerHeight + offset.y;
-
+  resizeWindow();
+  
   //abstraction making my life easier :)
   for (var i = 0; i < tools; i++) {
     setupEventListenerTool(i);
   }
 
   changeTool(0);
+
+  //localStorage.a = JSON.stringify(items);
 }
 
 window.addEventListener("resize", () => {
-  canvas.width = window.innerWidth + offset.x - 50; //50 is for the right side bar
-  canvas.height = window.innerHeight + offset.y;
+  resizeWindow();
   redraw();
 });
+
+function resizeWindow() {
+  canvas.width = window.innerWidth + offset.x - 50; //50 is for the right side bar
+  canvas.height = window.innerHeight + offset.y;
+}
 
 //makes the buttons switch between tools
 function setupEventListenerTool(i) {
@@ -70,6 +81,7 @@ function setupEventListenerTool(i) {
 
 function changeTool(i) {
   tool = i;
+  canDraw = true;
 
   //ui 
   for (var k = 0; k < tools; k++) {
@@ -84,7 +96,7 @@ function changeTool(i) {
     setWidthText();
   }
 
-  //also deselect 
+  //also deselect
   currentItem = undefined;
 }
 
@@ -98,15 +110,22 @@ function setWidthText() {
 function setBorderRadiusText() {
   find("width-area").style.display = "none";
   find("border-radius-area").style.display = "block";
-  find("width-input").value = currentBorderRadius;
+  find("border-radius-input").value = currentBorderRadius;
 }
 
 //function that clears canvas and redraws everything
 function redraw() {
+  //first get real scale (or not)
+  //ctx.setTransform(1, 0, 0, 1, canvasPos.x, canvasPos.y);
+  //ctx.scale(canvasSize.x / canvas.width, canvasSize.y / canvas.height);
+
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   for (var i = 0; i < items.length; i++) {
     items[i].render();
   }
+
+  //reset scale (or not)
+  //ctx.setTransform(1, 0, 0, 1, 0, 0);
 }
 
 //now some core functions for bounding boxes and such
@@ -175,14 +194,42 @@ function inBounds(pos, bounds, padding) {
   return true;
 }
 
+function fitImageToScreen(item) {
+  //given an item of type image, it modifies the scale
+  //to fit inside the canvas area
+  if (item.size.x > canvas.width || item.size.y > canvas.height) {
+    //the image is too big: scale it down
+
+    //first calculate the ratio of the image to the canvas 
+    var aspect = {
+      x: item.size.x / canvas.width,
+      y: item.size.y / canvas.height
+    }
+    //then make it fit the screen
+    var max = Math.max(aspect.x, aspect.y);
+    item.scale.x = 1 / max;
+    item.scale.y = 1 / max;
+
+    //center it
+    /* or not
+    if (aspect.x > aspect.y) {
+      //white space on vertical margins
+      item.pos.y -= (canvas.height - item.size.y) / 2;
+    } else {
+      item.pos.x -= (canvas.width - item.size.x) / 2;
+    }
+    */
+  }
+}
+
 /*some notes:
 here are global properties
 currentColor
 currentWidth
 currentBorderRadius
 isFilled
-they need to be updated on selection of an item.
-applied on creation of item
+they need to be updated on selection of an item
+and applied on creation of item
 
 3000 lines on 5/8/2021
 */

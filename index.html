@@ -6,12 +6,59 @@
     <link rel="stylesheet" href="./style.css">
   </head>
   <body>
-    <div class="top-bar">
+    <div class="top-bar"> 
       <div class="top-bar-background" id="top-bar-background"></div>
       <img class="top-bar-gator" src="./images/gator-white.png" alt="Gator">
+      <h1 class="top-bar-text" id="save-project-text">Save</h1>
+      <h1 class="top-bar-text-load" id="load-project-text">Load</h1>
+      <h1 class="top-bar-text-title" id="top-title-text">New Project 1</h1>
       <h1 class="top-bar-title"></h1>
       <img class="top-bar-profile" src="./images/blueMeshCircle2.png" alt="Profile">
-      <img class="top-bar-home" src="./images/home2-white.png" alt="Home">
+      <!--<img class="top-bar-home" src="./images/home2-white.png" alt="Home">-->
+    </div>
+
+    <div class="project-area" id="project-area">
+      <div class="project-background-blur"></div>
+      <div class="project-area-background" id="project-area-background">
+        <h2 class="project-area-title">Projects</h1>
+        <div class="project-area-bottom" id="project-item-area">
+          <div class="project-item"> 
+            <h4 class="project-item-title">Test Drawing</h4>
+            <h5 class="project-item-time">5 days ago</h5>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="generator-area" id="generator-area">
+      <div class="project-background-blur"></div>
+      <div class="project-area-background" id="generator-area-background">
+        <h2 class="project-area-title">Triangle Mesh Generator</h1>
+        <div class="project-area-bottom" id="generator-item-area">
+          <h3 class="generator-area-text">Width:</h3>
+          <input type="text" name="" value="" class="generator-input" id="gen-width-input">
+          <h3 class="generator-area-text">Height:</h3>
+          <input type="text" name="" value="" class="generator-input" id="gen-height-input">
+          <h3 class="generator-area-text">Frequency:</h3>
+          <input type="text" name="" value="" class="generator-input" id="gen-frequency-input">
+          <h3 class="generator-area-text">Noise:</h3>
+          <input type="text" name="" value="" class="generator-input" id="gen-noise-input">
+          <h3 class="generator-area-text">Color 1:</h3>
+          <input type="text" name="" value="" class="generator-input" id="gen-color1-input">
+          <h3 class="generator-area-text">Color 2:</h3>
+          <input type="text" name="" value="" class="generator-input" id="gen-color2-input">
+          <h3 class="generator-button" id="generator-button">Generate</h3>
+          <h3 class="generator-final-button" id="generator-reset">Reset values</h3>
+        </div>
+      </div>
+    </div>
+
+    <div class="save-area" id="save-area">
+      <div class="save-background-blur"></div>
+      <div class="save-area-background" id="save-area-background">
+        <input type="text" name="" value="" class="save-input" id="save-input">
+        <h2 class="save-button" id="save-button">Save</h1>
+      </div>
     </div>
 
     <div class="main-area">
@@ -90,12 +137,12 @@
           
           <div class="width-area" id="width-area">
             <h2 class="width-text" id="width-text">Width:</h2>
-            <input type="text" name="" value="5" class="width-input" id="width-input">
+            <input type="text" name="" value="" class="width-input" id="width-input">
             <div class="property-spacer"></div>
           </div>
           <div class="width-area" id="border-radius-area">
             <h2 class="border-radius-text" id="border-radius-text">Border radius:</h2>
-            <input type="text" name="" value="5" class="width-input" id="border-radius-input">
+            <input type="text" name="" value="" class="border-radius-input" id="border-radius-input">
             <div class="property-spacer"></div>
           </div>
           
@@ -122,6 +169,7 @@
       </div>
 
       <div class="image-area">
+        <canvas id="background-canvas" class="main-canvas"></canvas>
         <canvas id="canvas" class="main-canvas"></canvas>
       </div>
       <div class="right-bar">
@@ -150,6 +198,12 @@
           </div>
           <div class="action-item" id="action-7">
             <img class="action-image-h" src="./images/trash.png" alt="">
+          </div>
+          <div class="action-item" id="action-8">
+            <img class="action-image" src="./images/magnet.png" alt="">
+          </div>
+          <div class="action-item" id="action-9">
+            <img class="action-image" src="./images/gears.png" alt="">
           </div>
 
           <!--
@@ -181,7 +235,10 @@
 
   <script src="functions.js"></script>
   <script src="init.js"></script>
+  <script src="projects.js"></script>
   <script src="color.js"></script>
+  <script src="delunay.js"></script>
+  <script src="generator.js"></script>
   <script src="item.js"></script>
   <script src="text.js"></script>
   <script src="select.js"></script>

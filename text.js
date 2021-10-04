@@ -38,7 +38,7 @@ function setupTextInput(e) {
   text.setAttribute('id', 'text-tool');
   
   text.style.position = "fixed";
-  text.style['background-color'] = "rgba(0, 0, 0, 0.41)";
+  text.style['background-color'] = "rgba(0, 0, 0, 0.0)";
   text.style.top = (e.clientY - 8) + "px";
   text.style.left = e.clientX + "px";
   text.style.margin = "0";
@@ -49,9 +49,9 @@ function setupTextInput(e) {
   text.style['font-weight'] = 'bolder';
   text.style['caret-color'] = '#000204';
   text.style.font = '12px Helvetica';
-  text.style.color = "rgba(0, 0, 0, 0.35)";
+  text.style.color = "rgba(0, 0, 0, 0.0)";
   text.style.padding = '2px';
-  text.style.width = Math.min((window.innerWidth - e.clientX - 54), 100) + 'px'; //the 54 might change
+  text.style.width = (window.innerWidth - e.clientX - 54) + 'px'; //the 54 might change
   text.style.height = '16px';
   text.style.outline = "none";
   text.style.overflow = "hidden";

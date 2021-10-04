@@ -46,6 +46,49 @@ body {
   font-size: 24px;
 }
 
+.top-bar-text {
+  position: absolute;
+  left: 120px;
+  text-align: left;
+  color: #dbdae0;
+  z-index: 98;
+  margin: 0px;
+  margin-top: 25px;
+  font-weight: lighter;
+  font-size: 18px;
+  border-width: 2px;
+  border: solid #0F1216;
+}
+
+.top-bar-text-load {
+  border-width: 2px;
+  border: solid #0F1216;
+  position: absolute;
+  left: 190px;
+  text-align: left;
+  color: #dbdae0;
+  z-index: 98;
+  margin: 0px;
+  margin-top: 25px;
+  font-weight: lighter;
+  font-size: 18px;
+}
+
+.top-bar-text-title {
+  border-width: 2px;
+  border: solid #0F1216;
+  position: absolute;
+  /*farthest left is ~260 px*/
+  left: 260px;
+  text-align: left;
+  color: #dbdae0;
+  z-index: 98;
+  margin: 0px;
+  margin-top: 21px;
+  font-weight: 700;
+  font-size: 24px;
+}
+
 .top-bar-home {
   float: right;
   position: relative;
@@ -150,6 +193,7 @@ body {
   color: #ffffff;
   margin: 5px;
   margin-left: 8px;
+  margin-bottom: 7px;
 }
 
 .properties-right-area {
@@ -263,8 +307,8 @@ body {
 }
 
 .filled-button {
-  width: 83px;
-  background-color: #535359;
+  width: 82px;
+  background-color: #2a3034;
   height: 22px;
   margin-left:  7px;
   margin-top: 7px;
@@ -278,7 +322,7 @@ body {
 }
 
 .outlined-button {
-  width: 83px;
+  width: 82px;
   background-color: #535359;
   height: 22px;
   margin-left:  7px;
@@ -338,6 +382,7 @@ body {
   margin: 7px;
   margin-top: 10px;
   float: left;
+  margin-right: 0;
 }
 
 .border-radius-text {
@@ -356,7 +401,22 @@ body {
   padding: 2px;
   padding-left: 10px;
   height: 24px;
-  width: 79px;
+  width: 75px;
+  font-size: 24px;
+  margin: 7px;
+  margin-bottom: 0;
+  float: right;
+}
+
+.border-radius-input {
+  background-color: #535359;
+  color: #ffffff;
+  border-width: 0;
+  border-radius: 5px;
+  padding: 2px;
+  padding-left: 10px;
+  height: 24px;
+  width: 55px;
   font-size: 24px;
   margin: 7px;
   margin-bottom: 0;
@@ -374,7 +434,7 @@ body {
 }
 
 .import-button {
-  width: 83px;
+  width: 82px;
   background-color: #535359;
   height: 28px;
   margin: 0;
@@ -390,7 +450,7 @@ body {
 }
 
 .export-button {
-  width: 83px;
+  width: 82px;
   background-color: #535359;
   height: 28px;
   margin: 0;
@@ -400,7 +460,8 @@ body {
   margin-top: 7px;
   border-width: 0 3px;
   border: solid #535359;
-  position: relative;
+  position: absolute;
+  left: 89px;
   display: inline-block;
 }
 
@@ -418,8 +479,8 @@ body {
 }
 
 .main-canvas {
-  margin-top: 70px;
-  margin-left: 200px;
+  top: 70px;
+  left: 200px;
   position: fixed;
 }
 
@@ -478,5 +539,179 @@ body {
 }
 
 input[type="file"] {
-    display: none;
+  display: none;
+}
+
+.project-area {
+  position: fixed;
+  z-index: 1024;
+  display: none;
+}
+
+.project-background-blur {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  backdrop-filter: blur(2px);
+}
+
+.project-area-background {
+  position: relative;
+  top: 100px;
+  width: 320px;
+  left: calc(50vw - 160px);
+  z-index: 1024;
+  background-color: #2a3034;
+  border-radius: 8px;
+}
+
+.project-area-title {
+  position: relative;
+  width: 100%;
+  text-align: center;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  margin: 0px;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  background-color: #1c2025;
+  color: #E0E2E5
+}
+
+.project-area-bottom {
+  position: static;
+  width: 100%;
+  padding-bottom: 0.1px;
+  overflow-y: auto;
+  height: calc(100vh - 200px);
+}
+
+.project-item {
+  width: 90%;
+  background-color: #0F1216;
+  border-radius: 8px;
+  margin: 5%;
+}
+
+.project-item-title {
+  padding: 6px;
+  padding-left: 9px;
+  padding-bottom: 10px;
+  margin: 0;
+  color: #e0e2e5;
+}
+
+.project-item-time {
+  font-weight: 200;
+  padding-top: 0;
+  padding-left: 9px;
+  margin: 0;
+  padding-bottom: 5px;
+  color: #b6b8bb;
+}
+
+.save-area {
+  display: none;
+}
+
+.save-area-background {
+  position: relative;
+  top: 60px;
+  width: 130px;
+  height: 71px;
+  left: 80px;
+  z-index: 1025;
+  background-color: #2a3034;
+  border-radius: 8px;
+}
+
+.save-input {
+  width: 85%;
+  margin: 5%;
+  margin-bottom: 0px;
+  border-width: 0px;
+  z-index: 1026;
+  background-color: #535359;
+  color: #E0E2E5;
+  border-radius: 5px;
+}
+
+.save-button {
+  width: 90%;
+  margin: 5%;
+  margin-bottom: 6px;
+  z-index: 1026;
+  background-color: #535359;
+  color: #e9e9f0;
+  border-radius: 5px;
+  text-align: center;
+  user-select: none;
+}
+
+.save-background-blur {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1023;
+  backdrop-filter: blur(2px);
+}
+
+.generator-area {
+  position: fixed;
+  z-index: 1024;
+  display: none;
+}
+
+.generator-area-text {
+  padding: 9px;
+  padding-left: 20px;
+  margin: 0;
+  color: #e0e2e5;
+  font-weight: 300;
+  font-size: 18px;
+}
+
+.generator-input {
+  width: 260px;
+  margin: 0px;
+  margin-left: 24px;
+  font-size: 16px;
+  padding: 2px;
+  border-width: 0px;
+  z-index: 1026;
+  background-color: #535359;
+  color: #E0E2E5;
+  border-radius: 5px;
+}
+
+.generator-button {
+  width: 130px;
+  margin: 0px;
+  margin-top: 40px;
+  margin-left: 89px;
+  font-size: 20px;
+  padding: 6px;
+  border-width: 0px;
+  z-index: 1026;
+  background-color: #535359;
+  color: #E0E2E5;
+  border-radius: 5px;
+  text-align: center;
+}
+
+.generator-final-button {
+  margin: 9px;
+  margin-left: 24px;
+  margin-top: 40px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  padding: 2px;
+  border-width: 0px;
+  z-index: 1026;
+  color: #E0E2E5;
+  border-radius: 5px;
 }

@@ -4,7 +4,6 @@
 //rotate right and left
 //flip horizontally and vertically
 //group and ungroup (I have a feeling this one will result in the most pain)
-//delete button to delete current object (easy)
 
 //first setup listeners
 for (i = 0; i < actions; i++) {
@@ -44,8 +43,14 @@ function onMouseOverAction(i) {
   tooltip.style['font-size'] = '12px';
   tooltip.style.color = '#ffffff';
   tooltip.style.padding = '5px';
+  tooltip.id = "current-tooltip";
 
   currentTooltip = tooltip;
+
+  //snapping tooltip also says if snapping is currently enabled or not
+  if (i == 8) {
+    tooltip.innerHTML = ("Toggle snapping (" + (snapping ? "on)" : "off)"));
+  }
 }
 
 function onMouseOutAction(i) {
@@ -80,6 +85,12 @@ function doAction(action) {
       break;
     case 7:
       deleteItem();
+      break;
+    case 8:
+      toggleSnapping();
+      break;
+    case 9:
+      openGeneratorMenu();
       break;
     default:
       break;
@@ -237,4 +248,12 @@ function deleteItem() {
   //deletes the current item 
   items.splice(items.indexOf(currentItem), 1);
   redraw();
+}
+
+function toggleSnapping() {
+  snapping = !snapping;
+  //update tooltip live
+  if (find("current-tooltip")) {
+    find("current-tooltip").innerHTML = ("Toggle snapping (" + (snapping ? "on)" : "off)"));
+  }
 }

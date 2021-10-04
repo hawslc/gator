@@ -18,6 +18,7 @@ function updatePosition(e) {
 }
 
 find("canvas").onmouseleave = function mouseLeaveCanvas() {
+  if (!canDraw) return;
   //when the mouse leaves the canvas, deselect under certain conditions
   if (tool != 4 && tool != 7) { 
     currentItem = undefined;
@@ -31,6 +32,7 @@ function isOffCanvas(e) {
 }
 
 function mouseDown(e) {
+  if (!canDraw) return;
   //do stuff when the mouse is down
   isMouseDown = true;
   //first make sure we are on the canvas
@@ -82,6 +84,7 @@ function mouseDown(e) {
 }
 
 function mouseMoved(e) {
+  if (!canDraw) return;
   updateSliders(e);
 
   if (isOffCanvas(e)) return;
@@ -92,6 +95,7 @@ function mouseMoved(e) {
 }
 
 function mouseUp(e) {
+  if (!canDraw) return;
   //when they finish drawing an object, make that object calculate
   //its height and width
   isMouseDown = false;
@@ -286,29 +290,32 @@ function fillBucket(e) {
   currentItem.render();
 }
 
-find("width-input").oninput = function() {
-  //currentWidth = find("width-input").value;
-  var s = parseInt(find("width-input").value);
-  if (isNaN(s)) {
-    s = parseInt(find("width-input").value.substring(2));
-  }
+find("width-input").oninput = widthInput;
+find("border-radius-input").oninput = widthInput;
 
-  if(!isNaN(s)) {
-    if (find("width-text").innerHTML == "Width:") {
-      currentWidth = s;
-      if (currentItem) {
-        currentItem.width = currentWidth;
-        updateSelectedItem();
-      }
-    } else {
-      currentBorderRadius = s;
-      if (currentItem) {
-        if (currentItem.hasOwnProperty('roundness')) currentItem.roundness = currentBorderRadius;
-        updateSelectedItem();
-      }
+function widthInput() {
+  //also border radius input function
+  //currentWidth = find("width-input").value;
+  
+  if (find("width-area").style.display == "block") {
+  var s = parseInt(find("width-input").value);
+    currentWidth = s;
+    if (currentItem) {
+      currentItem.width = currentWidth;
+      updateSelectedItem();
+    }
+    console.log(4);
+  } else {
+    var s = parseInt(find("border-radius-input").value);
+    currentBorderRadius = s;
+    if (currentItem) {
+      if (currentItem.hasOwnProperty('roundness')) currentItem.roundness = currentBorderRadius;
+      updateSelectedItem();
     }
   }
 }
+
+
 
 //now, related to colors, the fill styles
 find("filled-button").onclick = function() {
@@ -339,10 +346,39 @@ function updateFillType() {
 //keydowns and ups 
 function keyDown(e) {
   isShiftKeyDown = e.shiftKey;
+  checkMoveKey(e);
 } 
 
 function keyUp(e) {
   isShiftKeyDown = e.shiftKey;
+}
+
+//arrow keys can move objects
+function checkMoveKey(e) {
+  if (!currentItem) return;
+  var moveDistance = 10;
+  if (isShiftKeyDown) moveDistance = 2;
+  
+  if (e.keyCode == 38) {
+    // up arrow
+    currentItem.pos = {x: currentItem.pos.x + 0, y: currentItem.pos.y - moveDistance}; 
+    updateSelectedItem();
+  }
+  else if (e.keyCode == 40) {
+    // down arrow
+    currentItem.pos = {x: currentItem.pos.x + 0, y: currentItem.pos.y + moveDistance}; 
+    updateSelectedItem();
+  }
+  else if (e.keyCode == 37) {
+    // left arrow
+    currentItem.pos = {x: currentItem.pos.x - moveDistance, y: currentItem.pos.y}; 
+    updateSelectedItem();
+  }
+  else if (e.keyCode == 39) {
+    // right arrow
+    currentItem.pos = {x: currentItem.pos.x + moveDistance, y: currentItem.pos.y}; 
+    updateSelectedItem();
+  }
 }
 
 //uploading an image 
@@ -367,32 +403,6 @@ find("import-upload").addEventListener('change', (e) => {
     }
   } 
 });
-
-function fitImageToScreen(item) {
-  //given an item of type image, it modifies the scale
-  //to fit inside the canvas area
-  if (item.size.x > canvas.width || item.size.y > canvas.height) {
-    //the image is too big: scale it down
-
-    //first calculate the ratio of the image to the canvas 
-    var aspect = {
-      x: item.size.x / canvas.width,
-      y: item.size.y / canvas.height
-    }
-    //then make it fit the screen
-    var max = Math.max(aspect.x, aspect.y);
-    item.scale.x = 1 / max;
-    item.scale.y = 1 / max;
-
-    //center it
-    if (aspect.x > aspect.y) {
-      //white space on vertical margins
-      item.pos.y += (canvas.height - item.size.y) / 2;
-    } else {
-      item.pos.x += (canvas.width - item.size.x) / 2;
-    }
-  }
-}
 
 //downloading an image 
 //4 lines of code from 2 hours of research

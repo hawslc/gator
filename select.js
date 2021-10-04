@@ -105,7 +105,7 @@ function matchGlobalProperties() {
   //now that we have set properties, update them
   refreshColorSliders();
   updateFillType();
-  if (currentItem.roundness || currentItem.roundness == 0) {
+  if (currentItem.filled && currentItem.type == 1 || currentItem.type == 8) {
     currentBorderRadius = currentItem.roundness;
     setBorderRadiusText();
   } else {
@@ -131,11 +131,61 @@ function moveSelectedItem(e) {
   var x = (e.clientX + offset.x) - selectOffset.x + selectStartPos.x;
   var y = (e.clientY + offset.y) - selectOffset.y + selectStartPos.y;
   currentItem.pos = {x: x, y: y};
+  var s = undefined; 
+
+  //snapping stuff
+  if (snapping) s = canSnapItem(currentItem);
+  if (s) {
+    if (s.x) {
+      currentItem.pos = {x: currentItem.pos.x - s.x, y: currentItem.pos.y - s.y};
+    } else {
+      for (var i = 0; i < s.length; i++) {
+        if (s[i].dir == "x") {
+          currentItem.pos = {x: currentItem.pos.x - s[i].x, y: currentItem.pos.y};
+        } else {
+          currentItem.pos = {x: currentItem.pos.x, y: currentItem.pos.y - s[i].y};
+        }
+      }
+    }
+  }
 
   updateSelectedItem();
+
   //text stuff
   if (currentItem.type == 4) {
     updateTextToolDimensions();
+  }
+  //snap stuff, draw snap 
+  if (s) {
+    if (s.x2) {
+      //simple dot
+      ctx.fillStyle = snapColor;
+      ctx.globalAlpha = 0.7;
+      ctx.fillRect(s.x2 - 3, s.y2 - 3, 7, 7);
+      ctx.globalAlpha = 1;
+    } else {
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = snapColor;
+      ctx.lineCap = 'round';
+      //complex lines
+      for (var i = 0; i < s.length; i++) {
+        ctx.beginPath();
+        if (s[i].dir == "x") {
+		      ctx.moveTo(s[i].x2, 0); 
+		      ctx.lineTo(s[i].x2, canvas.height); 
+        } else {
+          ctx.moveTo(0, s[i].y2); 
+		      ctx.lineTo(canvas.width, s[i].y2); 
+        }
+        ctx.stroke();
+        //highlight outline of alignement reference
+        var bounds = getBoundingBox(items[s[i].item]);
+        ctx.beginPath();
+        ctx.rect(bounds.pos.x, bounds.pos.y, bounds.size.x, bounds.size.y);
+        ctx.stroke();
+      }
+    }
+    
   }
 }
 
@@ -507,6 +557,118 @@ function correctNegativeSize(item) {
   }
 }
 
+function canSnapItem(item) {
+  //check if the item can snapped and snap it if it should be
+  var snapThreshold = 5; //5 pixels
+  var box = getBoundingBox(item);
+
+  //how it works
+  //generate a list of positions on the item that are snappable (middle, corners, etc)
+  //generate a list of positions on OTHER items that are also snappable
+  //compare the lists and snap if any two points are withing the threshold
+  var snapPositions = [];
+  var itemSnapPositions = [];
+  itemSnapPositions.push({x: box.pos.x, y: box.pos.y});
+  itemSnapPositions.push({x: box.pos.x + box.size.x, y: box.pos.y});
+  itemSnapPositions.push({x: box.pos.x, y: box.pos.y + box.size.y});
+  itemSnapPositions.push({x: box.pos.x + box.size.x, y: box.pos.y + box.size.y});
+  itemSnapPositions.push({x: box.pos.x + box.size.x / 2, y: box.pos.y + box.size.y / 2});
+
+  //now find other snap positions
+  for (var i = 0; i < items.length; i++) {
+    if (items[i] == item) continue;
+    box = getBoundingBox(items[i]);
+    snapPositions.push({x: box.pos.x, y: box.pos.y});
+    snapPositions.push({x: box.pos.x + box.size.x, y: box.pos.y});
+    snapPositions.push({x: box.pos.x, y: box.pos.y + box.size.y});
+    snapPositions.push({x: box.pos.x + box.size.x, y: box.pos.y + box.size.y});
+    snapPositions.push({x: box.pos.x + box.size.x / 2, y: box.pos.y + box.size.y / 2});
+  }
+
+  //now compare the lists
+  for (var i = 0; i < itemSnapPositions.length; i++) {
+    for (var k = 0; k < snapPositions.length; k++) {
+      if (Math.abs(itemSnapPositions[i].x - snapPositions[k].x) < snapThreshold) {
+        if (Math.abs(itemSnapPositions[i].y - snapPositions[k].y) < snapThreshold) {
+          return{x: itemSnapPositions[i].x - snapPositions[k].x, y: itemSnapPositions[i].y - snapPositions[k].y,
+          x2: snapPositions[k].x, y2: snapPositions[k].y};
+          i = itemSnapPositions.length;
+          k = snapPositions.length;
+        }
+      }
+    }
+  }
+
+  //no snap points found by this time, but that's ok
+  //now we check for snap lines
+
+  //criteria for an object to generate a snap line:
+  //has to be the same object type for a middle snap line
+  //has to have the same width or height and the same
+  //object type for a top / bottom / left / right snap line
+  //there are two possible snap lines: x and y ones
+
+  //these lines of code help remove duplicates for the next part
+  itemSnapPositions.splice(1, 1);
+  itemSnapPositions.splice(1, 1);
+
+  var snapLines = [];
+  var localPos = {};
+
+  for (var i = 0; i < items.length; i++) {
+    if (items[i] == item) continue;
+    //if (items[i].type != item.type) continue;
+    box = getBoundingBox(items[i]);
+
+    for (var j = 0; j < 3; j++) {
+      if (j == 0) {
+        localPos = {x: box.pos.x, y: box.pos.y};
+      } else if (j == 1) {
+        localPos = {x: box.pos.x + box.size.x / 2, y: box.pos.y + box.size.y / 2};
+      } else {
+        localPos = {x: box.pos.x + box.size.x, y: box.pos.y + box.size.y};
+      }
+
+      //alignment checks
+      for (var k = 0; k < itemSnapPositions.length; k++) {
+        if (Math.abs(localPos.x - itemSnapPositions[k].x) < snapThreshold) {
+          //aligns closely on the x axis
+          snapLines.push({dir: "x", x: itemSnapPositions[k].x - localPos.x, x2: localPos.x, item: i});
+        }
+        if (Math.abs(localPos.y - itemSnapPositions[k].y) < snapThreshold) {
+          //aligns closely on the y axis
+          snapLines.push({dir: "y", y: itemSnapPositions[k].y - localPos.y, y2: localPos.y, item: i});
+        }
+      }
+    }
+  }
+
+  //now decide which snap lines to use
+  //for now we'll keep it simple
+  var xObj;
+  var yObj;
+
+  for (var i = 0; i < snapLines.length; i++) {
+    if (snapLines[i].dir == "x") {
+      if (!xObj) {
+        xObj = snapLines[i];
+      }
+    } else {
+      if (!yObj) {
+        yObj = snapLines[i];
+      }
+    }
+  }
+
+  if (xObj || yObj) {
+    var returnable = [];
+    if (xObj) returnable.push(xObj);
+    if (yObj) returnable.push(yObj);
+    return returnable;
+  }
+
+  return undefined;
+}
 
 //old stretchSelectedItem code 
 /*

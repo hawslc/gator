@@ -12,7 +12,7 @@ class Item {
     5: eraser 
     6: fill bucket
     7: image 
-   
+    8: rounded rectangle (maybe)
     */
 
     //pos is for all items
@@ -411,6 +411,8 @@ class Item {
     //first solution: filltext(text), no wrapping
     //second solution: draw as svg, security errors
     //third solution: draw line by line
+    //fourth soulution: the same as first
+    /*
     if (this.text.length < 1) return;
     var words = this.text.split(' ');
     var lines = [""];
@@ -494,11 +496,12 @@ class Item {
       }
     }
     //go through each line and render it
-    ctx.font = this.font;
+    ctx.font = '12px Helvetica';
 
     for (i = 0; i < lines.length; i++) {
+      console.log("text is being rendered" + lines[i]);
       ctx.fillText(lines[i], this.pos.x + textOffset.x, this.pos.y + (i + 1) * (getFontSize() + 2) + textOffset.y * i);
-    }
+    }*/
 
     //get font function
     function getFontSize() {
@@ -510,9 +513,14 @@ class Item {
       return size; //return the found size
     }
 
-    //old code
-    //ctx.font = this.font;
-    //ctx.fillText(this.text, this.pos.x, this.pos.y);
+    //old code (now the new code)
+    ctx.font = this.font;
+    var lines = this.text.split("\n");
+
+    for (i = 0; i < lines.length; i++) {
+      ctx.fillText(lines[i], this.pos.x + 2, this.pos.y + 13 + i * 13.7);
+    }
+    
   }
 
   renderFillBucket() {
